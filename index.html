@@ -3,281 +3,903 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartQuote 智能报价系统</title>
+    <title>傻瓜报价系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap');
-        
-        body { 
-            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif; 
-            margin: 0; padding: 20px; 
-            background: linear-gradient(135deg, #f5f7fa, #e4e9f2); 
-            color: #1d1d1f;
-        }
-        .container { 
-            max-width: 96%; margin: 0 auto; 
-            background: rgba(255,255,255,0.96); 
-            backdrop-filter: blur(20px); 
-            border-radius: 24px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-            padding: 35px; 
-            min-height: 500px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* ── 标题区 ── */
-        h1 { text-align: center; font-weight: 600; font-size: 32px; margin-bottom: 35px; letter-spacing: -0.5px; }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
 
-        #titleLoaded {
-            display: none;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* 左侧功能导航 */
+        .sidebar-left {
+            width: 240px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 0 24px 32px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .nav-section {
+            flex: 1;
+        }
+
+        .nav-section h3 {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0 24px;
+            margin-bottom: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 中间主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 上传区域 */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 48px;
             text-align: center;
-            margin-bottom: 35px;
-            line-height: 1.25;
-        }
-        #titleLoaded .title-label {
-            font-size: 17px; font-weight: 500; color: #86868b; letter-spacing: 0.2px;
-        }
-        #titleLoaded .title-filename {
-            display: block; font-size: 34px; font-weight: 700; letter-spacing: -1px;
-            background: linear-gradient(135deg, #0071e3, #34c759);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            transition: all 0.3s;
+            background: var(--bg-card);
+            margin-bottom: 24px;
         }
 
-        .control-bar {
-            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-            margin-bottom: 30px; padding: 18px 24px; background: rgba(255,255,255,0.75);
-            border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        }
-        .control-btn {
-            padding: 12px 20px; font-size: 15px; font-weight: 500; cursor: pointer;
-            border: none; border-radius: 12px; min-width: 150px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .control-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); opacity: 0.9; }
-
-        .upload-cny-btn { background: #0071e3; color: white; }
-        .upload-usd-btn { background: #5856d6; color: white; }
-        .add-btn        { background: #34c759; color: white; }
-        .month36-btn    { background: #ff9500; color: white; }
-        .clear-btn      { background: #ff3b30; color: white; margin-right: 25px; }
-
-        .status { background: #e5f6e8; color: #1e7e2f; padding: 12px 20px; border-radius: 12px; font-size: 15px; text-align: center; }
-
-        .level-control { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 500; }
-        .custom-select { position: relative; width: 180px; }
-        .custom-select select {
-            width: 100%; padding: 12px 40px 12px 16px; font-size: 16px; background: white;
-            border: 1px solid #d2d2d7; border-radius: 12px; cursor: pointer; -webkit-appearance: none;
-        }
-        .custom-select::after {
-            content: "▼"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-            font-size: 12px; color: #8e8e93; pointer-events: none;
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
         }
 
-        /* ── 右侧组合：汇率 + 产品数量，整体靠右 ── */
-        .right-controls {
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.01);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-icon svg {
+            width: 32px;
+            height: 32px;
+            color: white;
+        }
+
+        .upload-zone h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .upload-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* 报价表格 */
+        .quote-table-wrapper {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .table-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+    width: 100%;
+justify-content: flex-end; 
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .inline-summary {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05));
+            border-bottom: 1px solid var(--border);
+        }
+
+        .inline-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inline-stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .inline-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .inline-total {
             margin-left: auto;
-            display: flex; align-items: center; gap: 12px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            justify-content: flex-end;
         }
 
-        /* ── 汇率 & 货币切换（无外边框） ── */
-        .currency-control {
+        .inline-total-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .inline-total-value {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        th {
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+
+th:nth-child(5),   /* 单价列表头 */
+th:nth-child(6),   /* 行总价列表头 */
+td:nth-child(5),   /* 单价列单元格 */
+td:nth-child(6) {  /* 行总价列单元格 */
+    text-align: right;
+}
+
+
+
+        td {
+            padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        tbody tr td:first-child {
+            border-left: 3px solid transparent;
+        }
+
+        tbody tr:hover td:first-child {
+            border-left-color: var(--primary);
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .table-input {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 80px;
+            text-align: center;
+        }
+
+        .table-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .price-cell {
+            font-weight: 600;
+            color: var(--primary-light);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            padding: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* 右侧操作面板 */
+        .sidebar-right {
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-left: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+            transform: translateX(-4px);
+        }
+
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+            color: var(--primary-light);
+            flex-shrink: 0;
+        }
+
+        .action-btn.danger:hover {
+            border-color: var(--danger);
+        }
+
+        .action-btn.danger svg {
+            color: var(--danger);
+        }
+
+        /* 级别选择 */
+        .level-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .level-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* 货币切换按钮 */
+        .currency-toggle {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .currency-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
             display: none;
-            align-items: center; gap: 10px;
-            padding: 10px 16px;
-            background: #f5f5f7;
-            border-radius: 14px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
-        .currency-control label { font-size: 14px; font-weight: 500; color: #48484a; white-space: nowrap; }
-        .rate-input {
-            width: 80px; padding: 8px 10px; font-size: 15px; font-weight: 600;
-            border: 1.5px solid #d2d2d7; border-radius: 10px; text-align: center;
-            font-family: "SF Mono", monospace; transition: border-color 0.2s;
-        }
-        .rate-input:focus { outline: none; border-color: #0071e3; }
-        .currency-toggle-btn {
-            padding: 9px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
-            border: none; border-radius: 10px; transition: all 0.25s;
-            min-width: 90px; letter-spacing: 0.5px;
-        }
-        .currency-toggle-btn.cny { background: #ff3b30; color: white; box-shadow: 0 4px 12px rgba(255,59,48,0.3); }
-        .currency-toggle-btn.usd { background: #34c759; color: white; box-shadow: 0 4px 12px rgba(52,199,89,0.3); }
-        .currency-toggle-btn:hover { transform: translateY(-1px); opacity: 0.9; }
 
-        .total-qty-status {
-            background: #f5f5f7; color: #1d1d1f; 
-            padding: 12px 24px; border-radius: 12px; font-size: 15px; 
-            font-weight: 600; border: 1px solid #d2d2d7;
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .modal h3 svg {
+            width: 24px;
+            height: 24px;
+            color: var(--primary);
+        }
+
+        .checkbox-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .checkbox-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .checkbox-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .checkbox-item input {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .checkbox-item label {
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { 
-            background: #f5f5f7; color: #1d1d1f; font-weight: 700; 
-            padding: 18px 12px; font-size: 18px; border-bottom: 2px solid #d2d2d7;
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-shrink: 0;
         }
-        td { padding: 12px 12px; border-bottom: 1px solid #f0f0f2; text-align: center; }
 
-        .product-text { padding: 10px; background: #f5f5f7; border: 1px solid #d2d2d7; border-radius: 10px; font-size: 15px; text-align: left; }
-        .narrow-input { width: 85px !important; text-align: center !important; padding: 10px 8px; font-size: 16px; border: 1px solid #d2d2d7; border-radius: 10px; }
-        
-        .unitPrice, .rowTotal { 
-            font-size: 19px; font-weight: 600; 
-            font-family: "SF Mono", "PingFang SC", monospace; color: #1d1d1f;
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
         }
-        
-        .delete-btn { 
-            background: #fff; color: #ff3b30; border: 1px solid #ff3b30; 
-            padding: 6px 12px; border-radius: 8px; cursor: pointer; 
-            font-size: 13px; font-weight: 500; transition: all 0.2s;
-        }
-        .delete-btn:hover { background: #ff3b30; color: #fff; }
 
-        .summary-bar { margin-top: 25px; padding-top: 20px; border-top: 2px solid #f0f0f2; display: flex; justify-content: flex-end; align-items: baseline; gap: 15px; }
-        .total-label { font-size: 18px; color: #86868b; font-weight: 500; }
-        .total-amount { font-size: 48px; font-weight: 700; color: #ff3b30; letter-spacing: -2px; font-family: "SF Mono", monospace; }
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
 
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 100; display: none;}
-        #multiAddDialog { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: #fff; padding: 35px; border-radius: 28px; z-index: 101; 
-            width: 850px; max-width: 90%; box-shadow: 0 30px 100px rgba(0,0,0,0.3); display: none;
+        /* 隐藏原始元素 */
+        #csvUploadCNY, #csvUploadUSD, #uploadButtons, #controls {
+            display: none !important;
         }
-        #productCheckboxes { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; 
-            max-height: 400px; overflow: auto; padding: 15px;
-            background: #f5f5f7; border-radius: 16px; margin-bottom: 25px;
-        }
-        #productCheckboxes label {
-            display: flex; align-items: center; padding: 14px; 
-            background: white; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 15px;
-        }
-        #productCheckboxes label:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        #productCheckboxes input { margin-right: 14px; transform: scale(1.3); accent-color: #0071e3; }
 
-        .dialog-footer { text-align: right; display: flex; justify-content: flex-end; gap: 15px; }
-        .dlg-btn { padding: 14px 35px; font-size: 16px; font-weight: 600; border-radius: 14px; cursor: pointer; transition: all 0.2s; border: none; }
-        .dlg-cancel { background: #eef0f2; color: #48484a; }
-        .dlg-confirm { background: #0071e3; color: white; box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3); }
-        .dlg-confirm:hover { transform: scale(1.02); }
+        /* 已加载状态显示 */
+        .loaded-info {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--success);
+        }
+
+        .loaded-info h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loaded-info h3 svg {
+            width: 20px;
+            height: 20px;
+            color: var(--success);
+        }
+
+        .loaded-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 默认标题 -->
-        <h1 id="titleDefault">SmartQuote 智能报价系统</h1>
+    <!-- 左侧功能导航 -->
+    <aside class="sidebar-left">
+        <div class="logo">
+            <h1>SmartQuote</h1>
+            <span>智能报价系统</span>
+        </div>
+        <nav class="nav-section">
+            <h3>功能菜单</h3>
+            <div class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <span>报价功能</span>
+            </div>
+        </nav>
+    </aside>
 
-        <!-- 加载后标题 -->
-        <div id="titleLoaded">
-            <span class="title-label">当前加载的报价表是：</span>
-            <span class="title-filename" id="titleFilename"></span>
+    <!-- 中间主内容区 -->
+    <main class="main-content">
+        <!-- 已加载信息 -->
+        <div class="loaded-info" id="loadedInfo">
+            <h3>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span id="titleFilename"></span>
+            </h3>
+            <p><span id="status"></span> | <span id="productCount"></span></p>
         </div>
 
-        <div class="control-bar">
-            <!-- 两个上传入口 -->
-            <input type="file" id="csvUploadCNY" accept=".csv" style="display:none;">
-            <input type="file" id="csvUploadUSD" accept=".csv" style="display:none;">
-
-            <!-- 上传按钮区，加载成功后整体隐藏 -->
-            <div id="uploadButtons" style="display:flex; gap:8px;">
-                <button class="control-btn upload-cny-btn"
-                    onclick="document.getElementById('csvUploadCNY').click()">📤 上传报价表（人民币）</button>
-                <button class="control-btn upload-usd-btn"
-                    onclick="document.getElementById('csvUploadUSD').click()">📤 上传报价表（美元）</button>
+        <!-- 上传区域 -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
             </div>
-
-            <div id="status" class="status" style="display:none;">已加载 <span id="productCount">0</span> 个产品</div>
-            
-            <button class="control-btn add-btn" onclick="showMultiAddDialog()">+ 批量添加产品</button>
-            <button class="control-btn month36-btn" onclick="setAllTo36Months()">一键改成36个月</button>
-            <button class="control-btn clear-btn" onclick="clearAllQuotes()">清空报价单</button>
-            
-            <div class="level-control" id="levelControl" style="display:none;">
-                <span>级别</span>
-                <div class="custom-select"><select id="globalLevel" onchange="recalculateAll()"></select></div>
+            <h3>上传价格表</h3>
+            <p>支持 CSV 格式，包含产品名称和各级别价格</p>
+            <div class="upload-buttons">
+                <button class="btn btn-primary" onclick="document.getElementById('csvUploadCNY').click()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    人民币报价表
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('csvUploadUSD').click()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    美元报价表
+                </button>
             </div>
+        </div>
 
-            <!-- 汇率 + 产品数量，整体靠右 -->
-            <div class="right-controls">
-                <div class="currency-control" id="currencyControl">
-                    <label>汇率 ¥/＄</label>
-                    <input type="number" class="rate-input" id="exchangeRate" value="7.25" min="0.01" step="0.01">
-                    <button class="currency-toggle-btn cny" id="currencyToggleBtn" onclick="toggleCurrency()">切换为 USD</button>
+        <!-- 报价表格 -->
+        <div class="quote-table-wrapper" id="quoteTableWrapper" style="display: none;">
+            <div class="table-header">
+                <div class="header-right">
+                    <span class="status-badge">已加载价格表</span>
+                    <div class="inline-stat">
+                        <span class="inline-stat-label">产品数量：</span>
+                        <span class="inline-stat-value" id="allProductQty">0</span>
+                    </div>
+                    <div class="inline-stat">
+                        <span class="inline-stat-label">报价项目：</span>
+                        <span class="inline-stat-value" id="rowCount">0</span>
+                    </div>
+                    <div class="inline-total">
+                        <span class="inline-total-label">总计 (<span id="summaryLabel">人民币</span>)：</span>
+                        <span class="inline-total-value" id="grandTotal">0.00</span>
+                    </div>
                 </div>
-                <div id="totalQtyDisplay" class="total-qty-status" style="display:none;">
-                    产品数量总计：<span id="allProductQty">0</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"></th>
+                        <th>产品名称</th>
+                        <th style="width: 100px;">时长 (月)</th>
+                        <th style="width: 80px;">数量</th>
+                        <th id="thUnitPrice" style="width: 120px;">单价 (人民币)</th>
+                        <th id="thRowTotal" style="width: 140px;">行总价 (人民币)</th>
+                    </tr>
+                </thead>
+                <tbody id="quoteBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- 右侧操作面板 -->
+    <aside class="sidebar-right">
+        <div class="panel-section">
+            <div class="panel-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                全局设置
+            </div>
+            <div class="action-buttons">
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">价格级别</label>
+                    <select id="globalLevel" class="level-select" onchange="recalculateAll()"></select>
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">汇率 ¥/$</label>
+                    <input type="number" id="exchangeRate" value="7.25" min="0.01" step="0.01" style="width: 100%; padding: 10px 12px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
                 </div>
             </div>
         </div>
 
-        <table id="quoteTable">
-            <thead>
-                <tr>
-                    <th style="width:8%">操作</th>
-                    <th style="width:32%">产品名称</th>
-                    <th style="width:12%">时长 (月)</th>
-                    <th style="width:12%">数量</th>
-                    <th id="thUnitPrice" style="width:18%">单价 (人民币)</th>
-                    <th id="thRowTotal"  style="width:18%">行总价 (人民币)</th>
-                </tr>
-            </thead>
-            <tbody id="quoteBody"></tbody>
-        </table>
+        <div class="panel-section">
+            <div class="panel-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"/>
+                </svg>
+                快捷操作
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="showMultiAddDialog()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    批量添加产品
+                </button>
+                <button class="action-btn" onclick="setAllTo36Months()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    一键改成36个月
+                </button>
+                <button class="action-btn danger" onclick="clearAllQuotes()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    清空报价单
+                </button>
+            </div>
+        </div>
 
-        <div class="summary-bar">
-            <span class="total-label" id="summaryLabel">预计总金额 (不含税) 人民币</span>
-            <span id="grandTotal" class="total-amount">0.00</span>
+        <div class="panel-section">
+            <div class="panel-title">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+                货币切换
+            </div>
+            <button id="currencyToggleBtn" class="currency-toggle" onclick="toggleCurrency()">
+                当前显示：人民币 (CNY)
+            </button>
+        </div>
+    </aside>
+
+    <!-- 批量添加弹窗 -->
+    <div class="modal-overlay" id="multiAddDialog">
+        <div class="modal">
+            <h3>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                选择待报价产品
+            </h3>
+            <div class="checkbox-list" id="productCheckboxes"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideMultiAddDialog()">取消</button>
+                <button class="btn btn-primary" onclick="addSelectedProducts()">确认添加</button>
+            </div>
         </div>
     </div>
 
-    <div id="overlay" onclick="hideMultiAddDialog()"></div>
-    <div id="multiAddDialog">
-        <h3 style="margin:0 0 25px 0; font-weight:600; font-size:24px; color:#1d1d1f;">选择待报价产品</h3>
-        <div id="productCheckboxes"></div>
-        <div class="dialog-footer">
-            <button class="dlg-btn dlg-cancel" onclick="hideMultiAddDialog()">取消</button>
-            <button class="dlg-btn dlg-confirm" onclick="addSelectedProducts()">确认添加</button>
-        </div>
-    </div>
+    <!-- 隐藏的原始元素 -->
+    <input type="file" id="csvUploadCNY" accept=".csv" style="display:none;">
+    <input type="file" id="csvUploadUSD" accept=".csv" style="display:none;">
 
     <script>
         let priceData = {};
         let currentGlobalLevel = "Level-1";
-        let baseCurrency    = "CNY"; // 报价表本身的币种，由上传按钮决定
-        let currentCurrency = "CNY"; // 当前显示币种
+        let baseCurrency = "CNY";
+        let currentCurrency = "CNY";
         const levels = ["Level-1","Level-2","Level-3","Level-4","Level-12","Level-13","Level-14"];
 
-        /* ── 获取汇率 ── */
         function getRate() {
             return parseFloat(document.getElementById('exchangeRate').value) || 7.25;
         }
 
-        /* ── 刷新所有货币相关文字 ── */
         function refreshCurrencyLabels() {
             const isCNY = currentCurrency === "CNY";
-            const btn = document.getElementById('currencyToggleBtn');
-            btn.textContent  = isCNY ? "切换为 USD" : "切换为 CNY";
-            btn.className    = "currency-toggle-btn " + (isCNY ? "cny" : "usd");
-            document.getElementById('thUnitPrice').textContent  = isCNY ? "单价 (人民币)"  : "单价 (美元)";
-            document.getElementById('thRowTotal').textContent   = isCNY ? "行总价 (人民币)" : "行总价 (美元)";
-            document.getElementById('summaryLabel').textContent = isCNY
-                ? "预计总金额 (不含税) 人民币"
-                : "预计总金额 (不含税) 美元";
+            const currencyText = isCNY ? "人民币 (CNY)" : "美元 (USD)";
+            document.getElementById('currencyToggleBtn').textContent = `当前显示：${currencyText}`;
+            document.getElementById('thUnitPrice').textContent = isCNY ? "单价 (人民币)" : "单价 (美元)";
+            document.getElementById('thRowTotal').textContent = isCNY ? "行总价 (人民币)" : "行总价 (美元)";
+            document.getElementById('summaryLabel').textContent = isCNY ? "人民币" : "美元";
         }
 
-        /* ── 点击切换按钮 ── */
         function toggleCurrency() {
-            currentCurrency = (currentCurrency === "CNY") ? "USD" : "CNY";
+            currentCurrency = currentCurrency === "CNY" ? "USD" : "CNY";
             refreshCurrencyLabels();
             document.querySelectorAll("#quoteBody tr").forEach(row => renderRowDisplay(row));
             updateSummaryInfo();
         }
 
-        /* ── base 币种 → 当前显示币种换算 ── */
         function convertFromBase(amount) {
             if (baseCurrency === currentCurrency) return amount;
             const rate = getRate();
             return baseCurrency === "CNY" ? amount / rate : amount * rate;
         }
 
-        /* ── 通用 CSV 上传处理 ── */
         function handleUpload(file, uploadedBase) {
             if (!file) return;
             const filenameNoExt = file.name.includes('.')
@@ -287,8 +909,7 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 try {
-                    const text  = event.target.result;
-                    const lines = text.trim().split(/\r?\n/);
+                    const lines = event.target.result.trim().split(/\r?\n/);
                     const header = lines[0].split(',').map(h => h.trim());
                     const newData = {};
                     for (let i = 1; i < lines.length; i++) {
@@ -303,25 +924,15 @@
                         }
                     }
                     priceData = newData;
-
-                    // 根据上传按钮设定默认币种
-                    baseCurrency    = uploadedBase;
-                    currentCurrency = uploadedBase;
+                    baseCurrency = currentCurrency = uploadedBase;
                     refreshCurrencyLabels();
 
-                    document.getElementById("productCount").textContent    = Object.keys(newData).length;
-                    document.getElementById("status").style.display        = "inline-block";
-                    document.getElementById("levelControl").style.display  = "flex";
-                    document.getElementById("totalQtyDisplay").style.display = "block";
-                    document.getElementById("currencyControl").style.display = "flex";
-
-                    // 隐藏上传按钮
-                    document.getElementById("uploadButtons").style.display = "none";
-
-                    // 替换标题
-                    document.getElementById("titleDefault").style.display = "none";
-                    document.getElementById("titleLoaded").style.display  = "block";
-                    document.getElementById("titleFilename").textContent  = filenameNoExt;
+                    document.getElementById("status").textContent = `已加载 ${Object.keys(newData).length} 个产品`;
+                    document.getElementById("productCount").textContent = filenameNoExt;
+                    document.getElementById("titleFilename").textContent = filenameNoExt;
+                    document.getElementById("loadedInfo").style.display = "block";
+                    document.getElementById("uploadZone").style.display = "none";
+                    document.getElementById("quoteTableWrapper").style.display = "block";
 
                     initGlobalLevelSelect();
                     alert("✅ 价格表加载成功！");
@@ -361,28 +972,55 @@
             updateSummaryInfo();
         }
 
-        function showMultiAddDialog() {
-            if (Object.keys(priceData).length === 0) return alert("请先上传价格表！");
-            const container = document.getElementById("productCheckboxes");
-            container.innerHTML = "";
-            const existing = new Set(Array.from(document.querySelectorAll("#quoteBody .product-text")).map(el => el.textContent));
-            Object.keys(priceData).sort().forEach(prod => {
-                if (existing.has(prod)) return;
-                const label = document.createElement("label");
-                label.innerHTML = `<input type="checkbox" value="${prod}"> ${prod}`;
-                container.appendChild(label);
+        function showMultiAddDialog() { if (Object.keys(priceData).length === 0) return alert("请先上传价格表！");
+    const container = document.getElementById("productCheckboxes");
+    container.innerHTML = "";
+    const existing = new Set(Array.from(document.querySelectorAll("#quoteBody .product-name")).map(el => el.textContent));
+    Object.keys(priceData).sort().forEach(prod => {
+        const div = document.createElement("div");
+        div.className = "checkbox-item";
+        const prodId = "prod_" + prod.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        div.innerHTML = `<input type="checkbox" value="${prod}" id="${prodId}"> <label for="${prodId}" style="cursor: pointer; flex: 1;">${prod}</label>`;
+        const checkbox = div.querySelector("input");
+        if (existing.has(prod)) {
+            div.classList.add("disabled");
+            checkbox.disabled = true;
+        } else {
+            // 点击整个 div 都可以切换复选框
+            div.addEventListener("click", function(e) {
+                // 防止点击 label 时触发两次
+                if (e.target.tagName !== 'LABEL' && e.target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    // 手动触发 change 事件
+                    checkbox.dispatchEvent(new Event("change"));
+                }
             });
-            document.getElementById("overlay").style.display = "block";
-            document.getElementById("multiAddDialog").style.display = "block";
+            // 确保点击 label 时也能正常工作
+            div.querySelector("label").addEventListener("click", function(e) {
+                // 不需要额外处理，label 默认就会触发 checkbox
+            });
+            checkbox.addEventListener("change", function() {
+                if (checkbox.checked) {
+                    div.style.background = "rgba(99, 102, 241, 0.2)";
+                    div.style.border = "1px solid var(--primary)";
+                } else {
+                    div.style.background = "";
+                    div.style.border = "";
+                }
+            });
+        }
+        container.appendChild(div);
+    });
+    document.getElementById("multiAddDialog").classList.add("active");
+   
         }
 
         function hideMultiAddDialog() {
-            document.getElementById("overlay").style.display = "none";
-            document.getElementById("multiAddDialog").style.display = "none";
+            document.getElementById("multiAddDialog").classList.remove("active");
         }
 
         function addSelectedProducts() {
-            const checked = Array.from(document.querySelectorAll("#productCheckboxes input:checked"));
+            const checked = Array.from(document.querySelectorAll("#productCheckboxes input:checked:not(:disabled)"));
             if (checked.length === 0) return alert("请至少选择一个产品");
             checked.forEach(cb => addQuoteRow(cb.value));
             hideMultiAddDialog();
@@ -390,25 +1028,23 @@
         }
 
         function addQuoteRow(selectedProduct = null) {
-            const tbody = document.getElementById("quoteBody");
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td><button class="delete-btn" onclick="deleteQuoteRow(this)">删除</button></td>
-                <td><div class="product-text">${selectedProduct || ''}</div></td>
-                <td><input type="number" class="narrow-input duration" value="12" min="1" onchange="calculateRow(this)"></td>
-                <td><input type="number" class="narrow-input quantity" value="1" min="1" onchange="calculateRow(this)"></td>
-                <td class="unitPrice">0.00</td>
-                <td class="rowTotal">0.00</td>
+                <td><button class="delete-btn" onclick="deleteQuoteRow(this)">×</button></td>
+                <td><span class="product-name">${selectedProduct || ''}</span></td>
+                <td><input type="number" class="table-input duration" value="12" min="1" onchange="calculateRow(this)"></td>
+                <td><input type="number" class="table-input quantity" value="1" min="1" onchange="calculateRow(this)"></td>
+                <td class="price-cell unitPrice">0.00</td>
+                <td class="price-cell rowTotal">0.00</td>
             `;
-            tbody.appendChild(row);
+            document.getElementById("quoteBody").appendChild(row);
             calculateRow(row);
         }
 
-        /* ── 计算行（以 base 币种存储原始值） ── */
         function calculateRow(el) {
-            const row = (el.tagName === 'TR') ? el : el.closest("tr");
+            const row = el.tagName === 'TR' ? el : el.closest("tr");
             if (!row) return;
-            const prod     = row.querySelector(".product-text").textContent;
+            const prod = row.querySelector(".product-name").textContent;
             const duration = parseInt(row.querySelector(".duration").value) || 0;
             const quantity = parseInt(row.querySelector(".quantity").value) || 0;
             let unitBase = 0;
@@ -416,29 +1052,30 @@
                 unitBase = (priceData[prod][currentGlobalLevel] / 12) * duration;
             }
             row.dataset.unitPriceBase = unitBase;
-            row.dataset.rowTotalBase  = unitBase * quantity;
+            row.dataset.rowTotalBase = unitBase * quantity;
             renderRowDisplay(row);
             updateSummaryInfo();
         }
 
-        /* ── 刷新行的显示值 ── */
         function renderRowDisplay(row) {
             row.querySelector(".unitPrice").textContent = convertFromBase(parseFloat(row.dataset.unitPriceBase) || 0).toFixed(2);
-            row.querySelector(".rowTotal").textContent  = convertFromBase(parseFloat(row.dataset.rowTotalBase)  || 0).toFixed(2);
+            row.querySelector(".rowTotal").textContent = convertFromBase(parseFloat(row.dataset.rowTotalBase) || 0).toFixed(2);
         }
 
         function deleteQuoteRow(btn) { btn.closest("tr").remove(); updateSummaryInfo(); }
 
         function updateSummaryInfo() {
-            let totalBase = 0, totalQty = 0;
+            let totalBase = 0, totalQty = 0, rowCount = 0;
             document.querySelectorAll("#quoteBody tr").forEach(row => {
                 totalBase += parseFloat(row.dataset.rowTotalBase) || 0;
-                totalQty  += parseInt(row.querySelector(".quantity").value) || 0;
+                totalQty += parseInt(row.querySelector(".quantity").value) || 0;
+                rowCount++;
             });
             const locale = currentCurrency === "USD" ? 'en-US' : 'zh-CN';
             document.getElementById("grandTotal").textContent =
                 convertFromBase(totalBase).toLocaleString(locale, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById("allProductQty").textContent = totalQty;
+            document.getElementById("rowCount").textContent = rowCount;
         }
 
         function clearAllQuotes() {
@@ -447,6 +1084,198 @@
                 updateSummaryInfo();
             }
         }
+
+        // 点击弹窗外部关闭
+        document.getElementById('multiAddDialog').addEventListener('click', function(e) {
+            if (e.target === this) hideMultiAddDialog();
+        });
     </script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.inland-security-footer {
+  position: fixed;
+  z-index: 10;
+  bottom: 0;
+  right: 0;
+  width: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+.trigger-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.minimax-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 300;
+  color: #adadad;
+  text-decoration: none;
+}
+
+.minimax-link:visited {
+  color: #adadad;
+}
+
+.minimax-link:hover {
+  color: #666666;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
+  font-size: 12px;
+  line-height: 17px;
+  background-color: #fafafa;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #171717;
+}
+
+/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: flex;
+}
+
+.info-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.beian-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #171717;
+}
+
+.beian-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 2px;
+}
+
+.underline-text {
+  color: #171717;
+  text-decoration: underline;
+}
+
+.underline-text:hover {
+  color: #000000;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .trigger-content {
+    background-color: transparent;
+  }
+
+  .minimax-link,
+  .minimax-link:visited {
+    color: #666666;
+  }
+
+  .minimax-link:hover {
+    color: #adadad;
+  }
+
+  .tooltip-content {
+    background-color: #262626;
+    color: #ededed;
+  }
+
+  .beian-link,
+  .underline-text {
+    color: #ededed;
+  }
+
+  .underline-text:hover {
+    color: #ffffff;
+  }
+}
+
+</style>
+<div class="inland-security-footer">
+  <div class="tooltip-container">
+    <div class="trigger-content">
+      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
+        <span>© 2026 MiniMax</span>
+      </a>
+    </div>
+    <div class="tooltip-content">
+      <section class="info-section">
+        <span>上海稀宇科技有限公司</span>
+      </section>
+
+      <section class="info-section">
+        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
+          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
+          <span class="underline-text">沪公网安备31010402010179号</span>
+        </a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
+          沪ICP备2023003282号-38
+        </a>
+      </section>
+
+      <section class="info-section">
+        <span>模型名称：MiniMax</span>
+        <span>备案号：Shanghai-MiniMax-202505230046</span>
+      </section>
+
+      <section class="info-section">
+        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
+          用户协议
+        </a>
+        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
+          隐私政策
+        </a>
+      </section>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
