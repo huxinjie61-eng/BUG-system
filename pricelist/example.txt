@@ -1,0 +1,13 @@
+产品名称,Level-1,Level-2,Level-3,Level-4,Level-12,Level-13,Level-14
+Acrobat Pro for teams,1333.5,1200.5,1134,1067.5,1134,1067.5,1001
+Acrobat Standard for teams,1155,1039.5,983.5,924,983.5,924,868
+After Effects for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Animate / Flash Professional for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Audition for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Creative Cloud for teams All Apps,5649,5085.5,4802,4518.5,4802,4518.5,4238.5
+Dreamweaver for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Illustrator for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+InCopy for teams,444.5,399,378,353.5,378,353.5,332.5
+InDesign for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Photoshop for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
+Premiere Pro for teams,2632,2369.5,2236.5,2107,2236.5,2107,1974
