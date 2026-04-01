@@ -662,6 +662,108 @@ td:nth-child(6) {  /* 行总价列单元格 */
             display: none !important;
         }
 
+        /* 预设价格表列表 */
+        .preset-section {
+            margin-top: 28px;
+            text-align: left;
+        }
+
+        .preset-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preset-section-title::before,
+        .preset-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preset-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-item:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(4px);
+        }
+
+        .preset-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .preset-item-left svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .preset-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .preset-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            flex-shrink: 0;
+        }
+
+        .preset-badge.cny {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .preset-badge.usd {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+        }
+
+        .preset-loading {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        .preset-error {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 8px 0;
+            display: none;
+        }
+
         /* 已加载状态显示 */
         .loaded-info {
             display: none;
@@ -745,6 +847,15 @@ td:nth-child(6) {  /* 行总价列单元格 */
                     </svg>
                     美元报价表
                 </button>
+            </div>
+
+            <!-- 预设价格表 -->
+            <div class="preset-section" id="presetSection" style="display:none;">
+                <div class="preset-section-title">或选择预设价格表</div>
+                <div class="preset-list" id="presetList">
+                    <div class="preset-loading">正在加载预设价格表…</div>
+                </div>
+                <div class="preset-error" id="presetError">暂无预设价格表</div>
             </div>
         </div>
 
@@ -948,6 +1059,87 @@ td:nth-child(6) {  /* 行总价列单元格 */
         document.getElementById('csvUploadUSD').addEventListener('change', function(e) {
             handleUpload(e.target.files[0], "USD"); this.value = "";
         });
+
+        /* ── 预设价格表：从 manifest.json 加载 ── */
+        async function loadPresetList() {
+            try {
+                const res = await fetch('./pricelist/manifest.json', { cache: 'no-cache' });
+                if (!res.ok) throw new Error('manifest not found');
+                const list = await res.json();
+                if (!Array.isArray(list) || list.length === 0) throw new Error('empty');
+
+                const container = document.getElementById('presetList');
+                container.innerHTML = '';
+
+                list.forEach(item => {
+                    const currency = (item.currency || 'CNY').toUpperCase();
+                    const div = document.createElement('div');
+                    div.className = 'preset-item';
+                    div.innerHTML = `
+                        <div class="preset-item-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span class="preset-item-name">${item.name || item.file}</span>
+                        </div>
+                        <span class="preset-badge ${currency.toLowerCase()}">${currency}</span>
+                    `;
+                    div.addEventListener('click', () => loadPresetFile(item.file, currency, item.name || item.file));
+                    container.appendChild(div);
+                });
+
+                document.getElementById('presetSection').style.display = 'block';
+            } catch (e) {
+                // manifest 不存在或为空，静默忽略，不展示预设区域
+            }
+        }
+
+        async function loadPresetFile(filename, currency, displayName) {
+            try {
+                const res = await fetch(`./pricelist/${filename}`, { cache: 'no-cache' });
+                if (!res.ok) throw new Error('file not found');
+                const text = await res.text();
+
+                // 复用解析逻辑
+                const lines = text.trim().split(/\r?\n/);
+                const header = lines[0].split(',').map(h => h.trim());
+                const newData = {};
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    let line = lines[i].replace(/"([^"]*)"/g, m => m.replace(/,/g, '###'));
+                    const values = line.split(',').map(v => v.trim().replace(/###/g, ','));
+                    const prodName = values[0].trim();
+                    if (!prodName) continue;
+                    newData[prodName] = {};
+                    for (let j = 1; j < header.length && j < values.length; j++) {
+                        if (levels.includes(header[j])) newData[prodName][header[j]] = parseFloat(values[j]) || 0;
+                    }
+                }
+
+                priceData = newData;
+                baseCurrency = currentCurrency = currency;
+                refreshCurrencyLabels();
+
+                const nameNoExt = displayName.includes('.')
+                    ? displayName.substring(0, displayName.lastIndexOf('.'))
+                    : displayName;
+
+                document.getElementById("status").textContent = `已加载 ${Object.keys(newData).length} 个产品`;
+                document.getElementById("productCount").textContent = nameNoExt;
+                document.getElementById("titleFilename").textContent = nameNoExt;
+                document.getElementById("loadedInfo").style.display = "block";
+                document.getElementById("uploadZone").style.display = "none";
+                document.getElementById("quoteTableWrapper").style.display = "block";
+
+                initGlobalLevelSelect();
+            } catch (e) {
+                alert(`❌ 加载失败：${filename}\n请确认文件存在且格式正确`);
+            }
+        }
+
+        // 页面加载时尝试拉取预设列表
+        loadPresetList();
 
         function initGlobalLevelSelect() {
             const select = document.getElementById("globalLevel");
