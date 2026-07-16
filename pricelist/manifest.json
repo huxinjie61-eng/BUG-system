@@ -1,5 +1,0 @@
-[
-  { "file": "new_cny.csv",    "name": "新购价格表",   "currency": "CNY" },
-  { "file": "enterprise_cny.csv",  "name": "企业版价格表",   "currency": "CNY" },
-  { "file": "standard_usd.csv",    "name": "Standard Pricing", "currency": "USD" }
-]
