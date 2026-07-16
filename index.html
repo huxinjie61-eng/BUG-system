@@ -1,1630 +1,339 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>傻瓜报价系统</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --bg-card-hover: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: #334155;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        /* 左侧功能导航 */
-        .sidebar-left {
-            width: 240px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border-right: 1px solid var(--border);
-            padding: 24px 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            padding: 0 24px 32px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
-        }
-
-        .logo h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo span {
-            font-size: 12px;
-            color: var(--text-muted);
-            display: block;
-            margin-top: 4px;
-        }
-
-        .nav-section {
-            flex: 1;
-        }
-
-        .nav-section h3 {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            padding: 0 24px;
-            margin-bottom: 12px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: var(--text-primary);
-        }
-
-        .nav-item.active {
-            background: rgba(99, 102, 241, 0.15);
-            color: var(--primary-light);
-            border-left-color: var(--primary);
-        }
-
-        .nav-item svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        .nav-item span {
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* 中间主内容区 */
-        .main-content {
-            flex: 1;
-            padding: 32px;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-
-        .page-header {
-            margin-bottom: 32px;
-        }
-
-        .page-header h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .page-header p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* 上传区域 */
-        .upload-zone {
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            padding: 48px;
-            text-align: center;
-            transition: all 0.3s;
-            background: var(--bg-card);
-            margin-bottom: 24px;
-        }
-
-        .upload-zone:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
-        }
-
-        .upload-zone.dragover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-            transform: scale(1.01);
-        }
-
-        .upload-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .upload-icon svg {
-            width: 32px;
-            height: 32px;
-            color: white;
-        }
-
-        .upload-zone h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .upload-zone p {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .upload-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--bg-card-hover);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.25);
-        }
-
-        /* 报价表格 */
-        .quote-table-wrapper {
-            background: var(--bg-card);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .table-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .table-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-    width: 100%;
-justify-content: flex-end; 
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-badge::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--success);
-            border-radius: 50%;
-        }
-
-        .inline-summary {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05));
-            border-bottom: 1px solid var(--border);
-        }
-
-        .inline-stat {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .inline-stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .inline-stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-light);
-        }
-
-        .inline-total {
-            margin-left: auto;
-            display: flex;
-            align-items: baseline;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
-        .inline-total-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .inline-total-value {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        th {
-            padding: 10px 12px;
-            text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-secondary);
-        }
-
-th:nth-child(5),   /* 单价列表头 */
-th:nth-child(6),   /* 行总价列表头 */
-td:nth-child(5),   /* 单价列单元格 */
-td:nth-child(6) {  /* 行总价列单元格 */
-    text-align: right;
-}
-
-
-
-        td {
-            padding: 10px 12px;
-            border-top: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        tbody tr:hover {
-            background: rgba(99, 102, 241, 0.05);
-        }
-
-        tbody tr td:first-child {
-            border-left: 3px solid transparent;
-        }
-
-        tbody tr:hover td:first-child {
-            border-left-color: var(--primary);
-        }
-
-        .product-name {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .table-input {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-            width: 80px;
-            text-align: center;
-        }
-
-        .table-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        .price-cell {
-            font-weight: 600;
-            color: var(--primary-light);
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-
-        .delete-btn {
-            background: transparent;
-            border: none;
-            color: var(--danger);
-            padding: 4px;
-            cursor: pointer;
-            font-size: 18px;
-            line-height: 1;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .delete-btn:hover {
-            transform: scale(1.2);
-        }
-
-        /* 右侧操作面板 */
-        .sidebar-right {
-            width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border-left: 1px solid var(--border);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .panel-section {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .panel-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .panel-title svg {
-            width: 16px;
-            height: 16px;
-            color: var(--primary);
-        }
-
-        .action-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .action-btn {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-        }
-
-        .action-btn:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--primary);
-            transform: translateX(-4px);
-        }
-
-        .action-btn svg {
-            width: 18px;
-            height: 18px;
-            color: var(--primary-light);
-            flex-shrink: 0;
-        }
-
-        .action-btn.danger:hover {
-            border-color: var(--danger);
-        }
-
-        .action-btn.danger svg {
-            color: var(--danger);
-        }
-
-        /* 级别选择 */
-        .level-select {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-        }
-
-        .level-select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* 货币切换按钮 */
-        .currency-toggle {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .currency-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        /* 弹窗 */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 800px;
-            width: 90%;
-            max-height: 85vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .modal h3 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .modal h3 svg {
-            width: 24px;
-            height: 24px;
-            color: var(--primary);
-        }
-
-        .checkbox-list {
-            max-height: 500px;
-            overflow-y: auto;
-            margin-bottom: 24px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            background: var(--bg-dark);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
-        }
-
-        .checkbox-item:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .checkbox-item.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .checkbox-item input {
-            margin-right: 10px;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .checkbox-item label {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            flex-shrink: 0;
-        }
-
-        /* 空状态 */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        /* 隐藏原始元素 */
-        #csvUploadCNY, #csvUploadUSD, #uploadButtons, #controls {
-            display: none !important;
-        }
-
-        /* ── 底部抽屉 ── */
-        .sheet-backdrop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-        }
-        .sheet-backdrop.active { display: block; }
-
-        .bottom-sheet {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: 72vh;
-            background: var(--bg-card);
-            border-radius: 20px 20px 0 0;
-            border-top: 1px solid var(--border);
-            z-index: 201;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
-            box-shadow: 0 -20px 60px rgba(0,0,0,0.4);
-        }
-        .bottom-sheet.active { transform: translateY(0); }
-
-        .sheet-handle {
-            padding: 12px 0 4px;
-            display: flex;
-            justify-content: center;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .sheet-handle-bar {
-            width: 40px; height: 4px;
-            background: var(--border);
-            border-radius: 2px;
-        }
-
-        .sheet-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 24px 16px;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-        .sheet-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            white-space: nowrap;
-        }
-        .sheet-title svg { color: var(--primary); }
-        .sheet-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            white-space: nowrap;
-        }
-        .sheet-search {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 8px 12px;
-            max-width: 320px;
-        }
-        .sheet-search svg { color: var(--text-muted); flex-shrink: 0; }
-        .sheet-search input {
-            background: none;
-            border: none;
-            outline: none;
-            color: var(--text-primary);
-            font-size: 13px;
-            width: 100%;
-        }
-        .sheet-search input::placeholder { color: var(--text-muted); }
-        .sheet-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            transition: all 0.2s;
-            margin-left: auto;
-        }
-        .sheet-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
-
-        .sheet-body {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .sheet-empty {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-        .sheet-table-wrap {
-            flex: 1;
-            overflow: auto;
-        }
-        .sheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        .sheet-table thead {
-            position: sticky;
-            top: 0;
-            background: var(--bg-card);
-            z-index: 1;
-        }
-        .sheet-table th {
-            padding: 10px 16px;
-            text-align: right;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            border-bottom: 2px solid var(--border);
-            white-space: nowrap;
-        }
-        .sheet-table th:first-child { text-align: left; }
-        .sheet-table td {
-            padding: 10px 16px;
-            border-top: 1px solid rgba(51,65,85,0.5);
-            text-align: right;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 13px;
-            color: var(--primary-light);
-        }
-        .sheet-table td:first-child {
-            text-align: left;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-        .sheet-table tbody tr:hover { background: rgba(99,102,241,0.05); }
-        .sheet-table tr.hidden-row { display: none; }
-
-        /* 已加载状态显示 */
-        .loaded-info {
-            display: none;
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            border-left: 4px solid var(--success);
-        }
-
-        .loaded-info h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .loaded-info h3 svg {
-            width: 20px;
-            height: 20px;
-            color: var(--success);
-        }
-
-        .loaded-info p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* ── 预设价格表列表 ── */
-        .preset-section { margin-top: 28px; text-align: left; }
-        .preset-section-title {
-            font-size: 11px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.08em; color: var(--text-muted);
-            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
-        }
-        .preset-section-title::before, .preset-section-title::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
-        }
-        .preset-list { display: flex; flex-direction: column; gap: 8px; }
-        .preset-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px; background: var(--bg-dark);
-            border: 1px solid var(--border); border-radius: 10px;
-            cursor: pointer; transition: all 0.2s; text-align: left;
-        }
-        .preset-item:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.08);
-            transform: translateX(4px);
-        }
-        .preset-item-left { display: flex; align-items: center; gap: 12px; }
-        .preset-item-left svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
-        .preset-item-name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-        .preset-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
-        .preset-badge.cny { background: rgba(16,185,129,0.15); color: var(--success); }
-        .preset-badge.usd { background: rgba(99,102,241,0.15); color: var(--primary-light); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日期计算器</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#334155;
+    --txt:#e2e8f0; --muted:#94a3b8; --accent:#6366f1; --accent2:#22d3ee;
+    --good:#34d399; --bad:#fb7185;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:'Segoe UI',system-ui,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1e293b 0%,var(--bg) 60%);
+    color:var(--txt); display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .card{
+    width:100%; max-width:880px; background:linear-gradient(180deg,var(--panel),#172033);
+    border:1px solid #2a3a55; border-radius:20px; padding:32px; box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+  }
+  h1{margin:0 0 6px;font-size:26px;font-weight:700}
+  .sub{color:var(--muted);margin:0 0 28px;font-size:14px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+  @media (max-width:640px){.grid{grid-template-columns:1fr}}
+  .field{background:#0d1530;border:1px solid #2a3a55;border-radius:14px;padding:16px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase}
+  .row{display:flex;gap:8px;align-items:center}
+  input[type=date]{flex:1;background:#1b2740;border:1px solid #2a3a55;color:var(--txt);
+    padding:10px 12px;border-radius:10px;font-size:15px;outline:none}
+  input[type=date]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.25)}
+  .seg{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .seg button{background:#1b2740;border:1px solid #2a3a55;color:var(--muted);
+    padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;transition:.15s}
+  .seg button:hover{color:var(--txt);border-color:var(--accent)}
+  input[type=text]{flex:1;background:#1b2740;border:1px solid #2a3a55;color:var(--txt);
+    padding:10px 12px;border-radius:10px;font-size:15px;outline:none;font-family:inherit}
+  input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.25)}
+  .ymd{gap:6px}
+  .ymd select{flex:1;background:#1b2740;border:1px solid #2a3a55;color:var(--txt);
+    padding:9px 4px;border-radius:10px;font-size:14px;outline:none;cursor:pointer;text-align:center}
+  .ymd select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.25)}
+  .hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+  /* slider */
+  .slider-wrap{background:#0d1530;border:1px solid #2a3a55;border-radius:14px;padding:20px 20px 24px}
+  .slider-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .slider-head label{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+  .range-values{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px}
+  .range-values span{color:var(--accent2);font-weight:600}
+  .track{position:relative;height:62px;margin:6px 4px}
+  .track .bar{position:absolute;top:20px;left:0;right:0;height:6px;background:#1b2740;border-radius:6px;overflow:hidden}
+  .track .sel{position:absolute;top:0;height:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px}
+  .ticks{position:absolute;top:28px;left:0;right:0;height:32px;pointer-events:none}
+  .tick{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+  .tick-line{width:1px;height:7px;background:#475569}
+  .tick-label{font-size:10px;color:var(--muted);margin-top:3px;white-space:nowrap}
+  .tick.major .tick-line{background:var(--accent2);height:9px}
+  .tick.major .tick-label{color:var(--accent2);font-weight:600}
+  .tick.today .tick-label{color:#fbbf24;font-weight:700}
+
+  .tip{position:fixed;z-index:60;pointer-events:none;display:none;
+    background:#0b1226;border:1px solid var(--accent);color:#fff;
+    padding:7px 12px;border-radius:9px;font-size:13px;font-weight:600;
+    box-shadow:0 8px 24px rgba(0,0,0,.55);white-space:nowrap;
+    transform:translate(-50%,calc(-100% - 14px))}
+  .tip::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);
+    border:6px solid transparent;border-top-color:var(--accent)}
+  .track input[type=range]{position:absolute;top:14px;left:0;width:100%;-webkit-appearance:none;background:transparent;pointer-events:none;margin:0;height:18px}
+  .track input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;pointer-events:auto;width:20px;height:20px;border-radius:50%;
+    background:#fff;border:3px solid var(--accent);cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .track input[type=range]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:grab}
+  .track input[type=range]:active::-webkit-slider-thumb{cursor:grabbing}
+
+  /* result */
+  .result{margin-top:26px;background:linear-gradient(135deg,#312e81,#1e3a8a);border:1px solid #4338ca;
+    border-radius:16px;padding:28px;text-align:center}
+  .result .big{font-size:54px;font-weight:800;letter-spacing:-1px;line-height:1}
+  .result .unit{font-size:18px;color:var(--muted);margin-left:8px}
+  .result .desc{color:#c7d2fe;margin-top:10px;font-size:14px}
+  .result .break{display:flex;gap:18px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+  .result .break div{background:rgba(255,255,255,.08);padding:10px 16px;border-radius:10px;min-width:96px}
+  .result .break .n{font-size:20px;font-weight:700}
+  .result .break .l{font-size:11px;color:var(--muted);text-transform:uppercase}
+  .neg{color:var(--bad)}
+</style>
 </head>
 <body>
-    <!-- 左侧功能导航 -->
-    <aside class="sidebar-left">
-        <div class="logo">
-            <h1>StupidQuote</h1>
-            <span>傻瓜报价系统</span>
-        </div>
-        <nav class="nav-section">
-            <h3>功能菜单</h3>
-            <div class="nav-item active">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                </svg>
-                <span>报价功能</span>
-            </div>
-            <div class="nav-item" id="navPriceDetail" onclick="showPriceDetailSheet()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M3 6h18M3 18h18"/>
-                </svg>
-                <span>价格表详情</span>
-            </div>
-        </nav>
-    </aside>
+<div class="card">
+  <h1>📅 日期计算器</h1>
+  <p class="sub">计算两个日期之间相差的天数 · 支持多种输入方式</p>
 
-    <!-- 中间主内容区 -->
-    <main class="main-content">
-        <!-- 已加载信息 -->
-        <div class="loaded-info" id="loadedInfo">
-            <h3>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span id="titleFilename"></span>
-            </h3>
-            <p><span id="status"></span> | <span id="productCount"></span></p>
-        </div>
-
-        <!-- 上传区域 -->
-        <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                </svg>
-            </div>
-            <h3>上传价格表</h3>
-            <p>支持 CSV 格式，包含产品名称和各级别价格</p>
-            <div class="upload-buttons">
-                <button class="btn btn-primary" onclick="document.getElementById('csvUploadCNY').click()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    人民币报价表
-                </button>
-                <button class="btn btn-secondary" onclick="document.getElementById('csvUploadUSD').click()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
-                    美元报价表
-                </button>
-            </div>
-
-            <!-- 预设价格表 -->
-            <div class="preset-section" id="presetSection" style="display:none;">
-                <div class="preset-section-title">或选择预设价格表</div>
-                <div class="preset-list" id="presetList"></div>
-            </div>
-        </div>
-
-        <!-- 报价表格 -->
-        <div class="quote-table-wrapper" id="quoteTableWrapper" style="display: none;">
-            <div class="table-header">
-                <div class="header-right">
-                    <span class="status-badge">已加载价格表</span>
-
-                    <div class="inline-stat">
-                        <span class="inline-stat-label">报价项目：</span>
-                        <span class="inline-stat-value" id="rowCount">0</span>
-                    </div>
-                    <div class="inline-stat">
-                        <span class="inline-stat-label">产品数量：</span>
-                        <span class="inline-stat-value" id="allProductQty">0</span>
-                    </div>                    
-                    <div class="inline-total">
-                        <span class="inline-total-label">总计 (<span id="summaryLabel">人民币</span>)：</span>
-                        <span class="inline-total-value" id="grandTotal">0.00</span>
-                    </div>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 40px;"></th>
-                        <th>产品名称</th>
-                        <th style="width: 100px;">时长 (月)</th>
-                        <th style="width: 80px;">数量</th>
-                        <th id="thUnitPrice" style="width: 120px;">单价 (人民币)</th>
-                        <th id="thRowTotal" style="width: 140px;">行总价 (人民币)</th>
-                    </tr>
-                </thead>
-                <tbody id="quoteBody"></tbody>
-            </table>
-        </div>
-    </main>
-
-    <!-- 右侧操作面板 -->
-    <aside class="sidebar-right">
-        <div class="panel-section">
-            <div class="panel-title">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-                </svg>
-                全局设置
-            </div>
-            <div class="action-buttons">
-                <div>
-                    <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">价格级别</label>
-                    <select id="globalLevel" class="level-select" onchange="recalculateAll()"></select>
-                </div>
-                <div>
-                    <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">汇率 ¥/$</label>
-                    <input type="number" id="exchangeRate" value="7.25" min="0.01" step="0.01" style="width: 100%; padding: 10px 12px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px;">
-                </div>
-            </div>
-        </div>
-
-        <div class="panel-section">
-            <div class="panel-title">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z"/>
-                </svg>
-                快捷操作
-            </div>
-            <div class="action-buttons">
-                <button class="action-btn" onclick="showMultiAddDialog()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                    </svg>
-                    批量添加产品
-                </button>
-                <button class="action-btn" onclick="setAllTo36Months()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    一键改成36个月
-                </button>
-                <button class="action-btn danger" onclick="clearAllQuotes()">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                    清空报价单
-                </button>
-            </div>
-        </div>
-
-        <div class="panel-section">
-            <div class="panel-title">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                </svg>
-                货币切换
-            </div>
-            <button id="currencyToggleBtn" class="currency-toggle" onclick="toggleCurrency()">
-                当前显示：人民币 (CNY)
-            </button>
-        </div>
-    </aside>
-
-    <!-- 批量添加弹窗 -->
-    <div class="modal-overlay" id="multiAddDialog">
-        <div class="modal">
-            <h3>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-                选择待报价产品
-            </h3>
-            <div class="checkbox-list" id="productCheckboxes"></div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="hideMultiAddDialog()">取消</button>
-                <button class="btn btn-primary" onclick="addSelectedProducts()">确认添加</button>
-            </div>
-        </div>
+  <div class="grid">
+    <!-- 起始日期 -->
+    <div class="field">
+      <label>起始日期</label>
+      <div class="seg">
+        <button data-tgt="start" data-what="today">今天</button>
+        <button data-tgt="start" data-what="-7">-7天</button>
+        <button data-tgt="start" data-what="+30">+30天</button>
+      </div>
+      <div class="row ymd">
+        <select id="startYear"></select>
+        <select id="startMonth"></select>
+        <select id="startDay"></select>
+      </div>
     </div>
 
-    <!-- 隐藏的原始元素 -->
-    <input type="file" id="csvUploadCNY" accept=".csv" style="display:none;">
-    <input type="file" id="csvUploadUSD" accept=".csv" style="display:none;">
-
-    <!-- 价格表详情底部抽屉 -->
-    <div class="sheet-backdrop" id="sheetBackdrop" onclick="hidePriceDetailSheet()"></div>
-    <div class="bottom-sheet" id="priceDetailSheet">
-        <div class="sheet-handle" onclick="hidePriceDetailSheet()">
-            <div class="sheet-handle-bar"></div>
-        </div>
-        <div class="sheet-header">
-            <div class="sheet-title">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M3 6h18M3 18h18"/>
-                </svg>
-                <span id="sheetTitle">价格表详情</span>
-            </div>
-            <div class="sheet-meta" id="sheetMeta"></div>
-            <div class="sheet-search">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"/>
-                </svg>
-                <input type="text" id="sheetSearch" placeholder="搜索产品…" oninput="filterSheetTable()">
-            </div>
-            <button class="sheet-close" onclick="hidePriceDetailSheet()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        <div class="sheet-body">
-            <div class="sheet-empty" id="sheetEmpty">请先加载价格表</div>
-            <div class="sheet-table-wrap" id="sheetTableWrap" style="display:none;">
-                <table class="sheet-table" id="sheetTable">
-                    <thead id="sheetThead"></thead>
-                    <tbody id="sheetTbody"></tbody>
-                </table>
-            </div>
-        </div>
+    <!-- 结束日期 -->
+    <div class="field">
+      <label>结束日期</label>
+      <div class="seg">
+        <button data-tgt="end" data-what="today">今天</button>
+        <button data-tgt="end" data-what="+90">+90天</button>
+        <button data-tgt="end" data-what="+400">+400天</button>
+      </div>
+      <div class="row ymd">
+        <select id="endYear"></select>
+        <select id="endMonth"></select>
+        <select id="endDay"></select>
+      </div>
     </div>
+  </div>
 
-    <script>
-        let priceData = {};
-        let currentGlobalLevel = "Level-1";
-        let baseCurrency = "CNY";
-        let currentCurrency = "CNY";
-        const levels = ["Level-1","Level-2","Level-3","Level-4","Level-12","Level-13","Level-14"];
-
-        function getRate() {
-            return parseFloat(document.getElementById('exchangeRate').value) || 7.25;
-        }
-
-        function refreshCurrencyLabels() {
-            const isCNY = currentCurrency === "CNY";
-            const currencyText = isCNY ? "人民币 (CNY)" : "美元 (USD)";
-            document.getElementById('currencyToggleBtn').textContent = `当前显示：${currencyText}`;
-            document.getElementById('thUnitPrice').textContent = isCNY ? "单价 (人民币)" : "单价 (美元)";
-            document.getElementById('thRowTotal').textContent = isCNY ? "行总价 (人民币)" : "行总价 (美元)";
-            document.getElementById('summaryLabel').textContent = isCNY ? "人民币" : "美元";
-        }
-
-        function toggleCurrency() {
-            currentCurrency = currentCurrency === "CNY" ? "USD" : "CNY";
-            refreshCurrencyLabels();
-            document.querySelectorAll("#quoteBody tr").forEach(row => renderRowDisplay(row));
-            updateSummaryInfo();
-        }
-
-        function convertFromBase(amount) {
-            if (baseCurrency === currentCurrency) return amount;
-            const rate = getRate();
-            return baseCurrency === "CNY" ? amount / rate : amount * rate;
-        }
-
-        function handleUpload(file, uploadedBase) {
-            if (!file) return;
-            const filenameNoExt = file.name.includes('.')
-                ? file.name.substring(0, file.name.lastIndexOf('.'))
-                : file.name;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const lines = event.target.result.trim().split(/\r?\n/);
-                    const header = lines[0].split(',').map(h => h.trim());
-                    const newData = {};
-                    for (let i = 1; i < lines.length; i++) {
-                        if (!lines[i].trim()) continue;
-                        let line = lines[i].replace(/"([^"]*)"/g, m => m.replace(/,/g, '###'));
-                        const values = line.split(',').map(v => v.trim().replace(/###/g, ','));
-                        const prodName = values[0].trim();
-                        if (!prodName) continue;
-                        newData[prodName] = {};
-                        for (let j = 1; j < header.length && j < values.length; j++) {
-                            if (levels.includes(header[j])) newData[prodName][header[j]] = parseFloat(values[j]) || 0;
-                        }
-                    }
-                    priceData = newData;
-                    baseCurrency = currentCurrency = uploadedBase;
-                    refreshCurrencyLabels();
-
-                    document.getElementById("status").textContent = `已加载 ${Object.keys(newData).length} 个产品`;
-                    document.getElementById("productCount").textContent = filenameNoExt;
-                    document.getElementById("titleFilename").textContent = filenameNoExt;
-                    document.getElementById("loadedInfo").style.display = "block";
-                    document.getElementById("uploadZone").style.display = "none";
-                    document.getElementById("quoteTableWrapper").style.display = "block";
-
-                    initGlobalLevelSelect();
-                    alert("✅ 价格表加载成功！");
-                } catch (err) { alert("读取失败，请检查CSV格式"); }
-            };
-            reader.readAsText(file);
-        }
-
-        document.getElementById('csvUploadCNY').addEventListener('change', function(e) {
-            handleUpload(e.target.files[0], "CNY"); this.value = "";
-        });
-        document.getElementById('csvUploadUSD').addEventListener('change', function(e) {
-            handleUpload(e.target.files[0], "USD"); this.value = "";
-        });
-
-        /* ── 预设价格表：从 manifest.json 加载 ── */
-        async function loadPresetList() {
-            try {
-                const res = await fetch('./pricelist/manifest.json', { cache: 'no-cache' });
-                if (!res.ok) throw new Error('not found');
-                const list = await res.json();
-                if (!Array.isArray(list) || list.length === 0) throw new Error('empty');
-
-                const container = document.getElementById('presetList');
-                container.innerHTML = '';
-                list.forEach(item => {
-                    const currency = (item.currency || 'CNY').toUpperCase();
-                    const div = document.createElement('div');
-                    div.className = 'preset-item';
-                    div.innerHTML = `
-                        <div class="preset-item-left">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span class="preset-item-name">${item.name || item.file}</span>
-                        </div>
-                        <span class="preset-badge ${currency.toLowerCase()}">${currency}</span>
-                    `;
-                    div.addEventListener('click', () => loadPresetFile(item.file, currency, item.name || item.file));
-                    container.appendChild(div);
-                });
-                document.getElementById('presetSection').style.display = 'block';
-            } catch (e) {
-                // manifest 不存在则静默忽略
-            }
-        }
-
-        async function loadPresetFile(filename, currency, displayName) {
-            try {
-                const res = await fetch(`./pricelist/${filename}`, { cache: 'no-cache' });
-                if (!res.ok) throw new Error('not found');
-                const text = await res.text();
-                const nameNoExt = displayName.includes('.')
-                    ? displayName.substring(0, displayName.lastIndexOf('.'))
-                    : displayName;
-                // 复用 handleUpload 的解析逻辑，构造一个虚拟 File-like 对象
-                const blob = new Blob([text], { type: 'text/csv' });
-                const file = new File([blob], nameNoExt + '.csv');
-                handleUpload(file, currency);
-            } catch (e) {
-                alert(`❌ 加载失败：${filename}\n请确认文件存在且格式正确`);
-            }
-        }
-
-        loadPresetList();
-
-        function initGlobalLevelSelect() {
-            const select = document.getElementById("globalLevel");
-            select.innerHTML = "";
-            levels.forEach(l => {
-                const opt = document.createElement("option");
-                opt.value = l; opt.textContent = l;
-                if (l === currentGlobalLevel) opt.selected = true;
-                select.appendChild(opt);
-            });
-        }
-
-        function recalculateAll() {
-            currentGlobalLevel = document.getElementById("globalLevel").value;
-            document.querySelectorAll("#quoteBody tr").forEach(row => calculateRow(row));
-            updateSummaryInfo();
-        }
-
-        function setAllTo36Months() {
-            const rows = document.querySelectorAll("#quoteBody tr");
-            if (rows.length === 0) return alert("当前没有报价行");
-            rows.forEach(row => { row.querySelector(".duration").value = 36; calculateRow(row); });
-            updateSummaryInfo();
-        }
-
-        function showMultiAddDialog() { if (Object.keys(priceData).length === 0) return alert("请先上传价格表！");
-    const container = document.getElementById("productCheckboxes");
-    container.innerHTML = "";
-    const existing = new Set(Array.from(document.querySelectorAll("#quoteBody .product-name")).map(el => el.textContent));
-    Object.keys(priceData).sort().forEach(prod => {
-        const div = document.createElement("div");
-        div.className = "checkbox-item";
-        const prodId = "prod_" + prod.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-        div.innerHTML = `<input type="checkbox" value="${prod}" id="${prodId}"> <label for="${prodId}" style="cursor: pointer; flex: 1;">${prod}</label>`;
-        const checkbox = div.querySelector("input");
-        if (existing.has(prod)) {
-            div.classList.add("disabled");
-            checkbox.disabled = true;
-        } else {
-            // 点击整个 div 都可以切换复选框
-            div.addEventListener("click", function(e) {
-                // 防止点击 label 时触发两次
-                if (e.target.tagName !== 'LABEL' && e.target !== checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                    // 手动触发 change 事件
-                    checkbox.dispatchEvent(new Event("change"));
-                }
-            });
-            // 确保点击 label 时也能正常工作
-            div.querySelector("label").addEventListener("click", function(e) {
-                // 不需要额外处理，label 默认就会触发 checkbox
-            });
-            checkbox.addEventListener("change", function() {
-                if (checkbox.checked) {
-                    div.style.background = "rgba(99, 102, 241, 0.2)";
-                    div.style.border = "1px solid var(--primary)";
-                } else {
-                    div.style.background = "";
-                    div.style.border = "";
-                }
-            });
-        }
-        container.appendChild(div);
-    });
-    document.getElementById("multiAddDialog").classList.add("active");
-   
-        }
-
-        function hideMultiAddDialog() {
-            document.getElementById("multiAddDialog").classList.remove("active");
-        }
-
-        function addSelectedProducts() {
-            const checked = Array.from(document.querySelectorAll("#productCheckboxes input:checked:not(:disabled)"));
-            if (checked.length === 0) return alert("请至少选择一个产品");
-            checked.forEach(cb => addQuoteRow(cb.value));
-            hideMultiAddDialog();
-            updateSummaryInfo();
-        }
-
-        function addQuoteRow(selectedProduct = null) {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td><button class="delete-btn" onclick="deleteQuoteRow(this)">×</button></td>
-                <td><span class="product-name">${selectedProduct || ''}</span></td>
-                <td><input type="number" class="table-input duration" value="12" min="1" onchange="calculateRow(this)"></td>
-                <td><input type="number" class="table-input quantity" value="1" min="1" onchange="calculateRow(this)"></td>
-                <td class="price-cell unitPrice">0.00</td>
-                <td class="price-cell rowTotal">0.00</td>
-            `;
-            document.getElementById("quoteBody").appendChild(row);
-            calculateRow(row);
-        }
-
-        function calculateRow(el) {
-            const row = el.tagName === 'TR' ? el : el.closest("tr");
-            if (!row) return;
-            const prod = row.querySelector(".product-name").textContent;
-            const duration = parseInt(row.querySelector(".duration").value) || 0;
-            const quantity = parseInt(row.querySelector(".quantity").value) || 0;
-            let unitBase = 0;
-            if (priceData[prod] && priceData[prod][currentGlobalLevel] !== undefined) {
-                unitBase = (priceData[prod][currentGlobalLevel] / 12) * duration;
-            }
-            row.dataset.unitPriceBase = unitBase;
-            row.dataset.rowTotalBase = unitBase * quantity;
-            renderRowDisplay(row);
-            updateSummaryInfo();
-        }
-
-        function renderRowDisplay(row) {
-            row.querySelector(".unitPrice").textContent = convertFromBase(parseFloat(row.dataset.unitPriceBase) || 0).toFixed(2);
-            row.querySelector(".rowTotal").textContent = convertFromBase(parseFloat(row.dataset.rowTotalBase) || 0).toFixed(2);
-        }
-
-        function deleteQuoteRow(btn) { btn.closest("tr").remove(); updateSummaryInfo(); }
-
-        function updateSummaryInfo() {
-            let totalBase = 0, totalQty = 0, rowCount = 0;
-            document.querySelectorAll("#quoteBody tr").forEach(row => {
-                totalBase += parseFloat(row.dataset.rowTotalBase) || 0;
-                totalQty += parseInt(row.querySelector(".quantity").value) || 0;
-                rowCount++;
-            });
-            const locale = currentCurrency === "USD" ? 'en-US' : 'zh-CN';
-            document.getElementById("grandTotal").textContent =
-                convertFromBase(totalBase).toLocaleString(locale, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            document.getElementById("allProductQty").textContent = totalQty;
-            document.getElementById("rowCount").textContent = rowCount;
-        }
-
-        function clearAllQuotes() {
-            if (confirm("确定清空整个报价单吗？")) {
-                document.getElementById("quoteBody").innerHTML = "";
-                updateSummaryInfo();
-            }
-        }
-
-        // 点击弹窗外部关闭
-        document.getElementById('multiAddDialog').addEventListener('click', function(e) {
-            if (e.target === this) hideMultiAddDialog();
-        });
-
-        /* ── 价格表详情底部抽屉 ── */
-        function showPriceDetailSheet() {
-            if (Object.keys(priceData).length === 0) {
-                alert("请先加载价格表！");
-                return;
-            }
-
-            // 渲染表格
-            const thead = document.getElementById('sheetThead');
-            const tbody = document.getElementById('sheetTbody');
-            const currency = baseCurrency === 'USD' ? '美元' : '人民币';
-
-            // 表头
-            thead.innerHTML = '<tr><th>产品名称</th>' +
-                levels.map(l => `<th>${l}<br><span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0">(${currency}/年)</span></th>`).join('') +
-                '</tr>';
-
-            // 行数据
-            tbody.innerHTML = '';
-            Object.keys(priceData).sort().forEach(prod => {
-                const tr = document.createElement('tr');
-                tr.dataset.name = prod.toLowerCase();
-                const cells = levels.map(l => {
-                    const val = priceData[prod][l];
-                    return `<td>${val !== undefined ? val.toLocaleString() : '—'}</td>`;
-                }).join('');
-                tr.innerHTML = `<td>${prod}</td>${cells}`;
-                tbody.appendChild(tr);
-            });
-
-            // 元数据
-            const count = Object.keys(priceData).length;
-            const fname = document.getElementById('titleFilename').textContent;
-            document.getElementById('sheetTitle').textContent = fname || '价格表详情';
-            document.getElementById('sheetMeta').textContent = `${count} 个产品 · ${currency}`;
-            document.getElementById('sheetSearch').value = '';
-            document.getElementById('sheetEmpty').style.display = 'none';
-            document.getElementById('sheetTableWrap').style.display = 'block';
-
-            document.getElementById('sheetBackdrop').classList.add('active');
-            requestAnimationFrame(() => {
-                document.getElementById('priceDetailSheet').classList.add('active');
-            });
-        }
-
-        function hidePriceDetailSheet() {
-            document.getElementById('priceDetailSheet').classList.remove('active');
-            document.getElementById('sheetBackdrop').classList.remove('active');
-        }
-
-        function filterSheetTable() {
-            const q = document.getElementById('sheetSearch').value.toLowerCase().trim();
-            document.querySelectorAll('#sheetTbody tr').forEach(tr => {
-                tr.classList.toggle('hidden-row', q && !tr.dataset.name.includes(q));
-            });
-        }
-
-        // ESC 关闭抽屉
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') hidePriceDetailSheet();
-        });
-    </script>
-
-<style>
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.inland-security-footer {
-  position: fixed;
-  z-index: 10;
-  bottom: 0;
-  right: 0;
-  width: fit-content;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.tooltip-container {
-  position: relative;
-}
-
-.trigger-content {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  background-color: transparent;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.minimax-link {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 300;
-  color: #adadad;
-  text-decoration: none;
-}
-
-.minimax-link:visited {
-  color: #adadad;
-}
-
-.minimax-link:hover {
-  color: #666666;
-}
-
-.tooltip-content {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  padding-bottom: 16px; /* 8px 内容间距 + 8px 用于鼠标移动的透明区域 */
-  font-size: 12px;
-  line-height: 17px;
-  background-color: #fafafa;
-  border-radius: 12px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  color: #171717;
-}
-
-/* 创建透明的连接区域，让鼠标可以平滑移动到 tooltip */
-.tooltip-content::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  right: 0;
-  height: 16px;
-}
-
-.tooltip-container:hover .tooltip-content {
-  display: flex;
-}
-
-.info-section {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-}
-
-.beian-link {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: #171717;
-}
-
-.beian-icon {
-  width: 14px;
-  height: 14px;
-  margin-right: 2px;
-}
-
-.underline-text {
-  color: #171717;
-  text-decoration: underline;
-}
-
-.underline-text:hover {
-  color: #000000;
-}
-
-/* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .trigger-content {
-    background-color: transparent;
-  }
-
-  .minimax-link,
-  .minimax-link:visited {
-    color: #666666;
-  }
-
-  .minimax-link:hover {
-    color: #adadad;
-  }
-
-  .tooltip-content {
-    background-color: #262626;
-    color: #ededed;
-  }
-
-  .beian-link,
-  .underline-text {
-    color: #ededed;
-  }
-
-  .underline-text:hover {
-    color: #ffffff;
-  }
-}
-
-</style>
-<div class="inland-security-footer">
-  <div class="tooltip-container">
-    <div class="trigger-content">
-      <a href="https://www.minimaxi.com/" target="_blank" rel="noreferrer" class="minimax-link">
-        <span>© 2026 MiniMax</span>
-      </a>
+  <!-- 刻度滑块 -->
+  <div class="slider-wrap">
+    <div class="slider-head">
+      <label>刻度滑块（默认起点=今天，向后 400 天）</label>
+      <div class="range-values">
+        <span id="thumbStart">—</span> <span style="color:var(--muted)">→</span> <span id="thumbEnd">—</span>
+      </div>
     </div>
-    <div class="tooltip-content">
-      <section class="info-section">
-        <span>上海稀宇科技有限公司</span>
-      </section>
-
-      <section class="info-section">
-        <a class="beian-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010402010179" target="_blank" rel="noreferrer">
-          <img alt="hailuo-beian-icon" src="https://cdn.hailuoai.com/hailuo-video-web/public_assets/223037d3-79fd-4db0-a456-749f38a6a14b.png" class="beian-icon">
-          <span class="underline-text">沪公网安备31010402010179号</span>
-        </a>
-        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer" class="underline-text">
-          沪ICP备2023003282号-38
-        </a>
-      </section>
-
-      <section class="info-section">
-        <span>模型名称：MiniMax</span>
-        <span>备案号：Shanghai-MiniMax-202505230046</span>
-      </section>
-
-      <section class="info-section">
-        <a href="https://agent.minimaxi.com/doc/zh/terms-of-service.html" target="_blank" rel="noreferrer" class="underline-text">
-          用户协议
-        </a>
-        <a href="https://agent.minimaxi.com/doc/zh/privacy-policy.html" target="_blank" rel="noreferrer" class="underline-text">
-          隐私政策
-        </a>
-      </section>
+    <div class="track" id="track">
+      <div class="bar"><div class="sel" id="sel"></div></div>
+      <div class="ticks" id="ticks"></div>
+      <input type="range" id="r1" min="0" max="400" value="0">
+      <input type="range" id="r2" min="0" max="400" value="400">
     </div>
+    <div class="hint">拖动两个滑块选择日期范围。两个滑块可互换起止。</div>
+  </div>
+  <div class="tip" id="tip"></div>
+
+  <!-- 结果 -->
+  <div class="result">
+    <div><span class="big" id="bigDays">0</span><span class="unit">天</span></div>
+    <div class="desc" id="desc">请选择两个日期</div>
+    <div class="break" id="break"></div>
   </div>
 </div>
 
+<script>
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+const MAXD = 400; // 滑块跨度天数
+
+const $ = id => document.getElementById(id);
+const r1=$('r1'), r2=$('r2');
+const sY=$('startYear'), sM=$('startMonth'), sD=$('startDay');
+const eY=$('endYear'),   eM=$('endMonth'),   eD=$('endDay');
+
+// 年份范围：今天前 5 年 ~ 后 2 年
+const YMIN=TODAY.getFullYear()-5, YMAX=TODAY.getFullYear()+2;
+
+// ---- 工具 ----
+function fmt(d){ // yyyy-mm-dd
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);x.setHours(0,0,0,0);return x;}
+function daysBetween(a,b){return Math.round((b-a)/86400000);}
+function daysInMonth(y,m){return new Date(y,m,0).getDate();}
+
+// ---- 下拉框填充 ----
+function fillYearMonth(){
+  [sY,eY].forEach(sel=>{
+    sel.innerHTML='';
+    for(let y=YMIN;y<=YMAX;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'年';sel.appendChild(o);}
+  });
+  [sM,eM].forEach(sel=>{
+    sel.innerHTML='';
+    for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'月';sel.appendChild(o);}
+  });
+}
+function fillDays(sel,y,m){
+  const keep=+sel.value;
+  sel.innerHTML='';
+  const n=daysInMonth(y,m);
+  for(let d=1;d<=n;d++){const o=document.createElement('option');o.value=d;o.textContent=d+'日';sel.appendChild(o);}
+  if(keep&&keep<=n) sel.value=keep;
+}
+function setSelects(Y,M,D,d){
+  Y.value=d.getFullYear(); M.value=d.getMonth()+1;
+  fillDays(D,d.getFullYear(),d.getMonth()+1);
+  D.value=d.getDate();
+}
+function readSelects(Y,M,D){ // 读取并自愈：月份切换后天数自动夹紧
+  const y=+Y.value, m=+M.value;
+  fillDays(D,y,m);
+  return new Date(y,m-1,+D.value);
+}
+
+// ---- 核心状态 ----
+let curStart=null, curEnd=null; // Date 对象
+
+function setStart(d){
+  curStart=d;
+  if(d) setSelects(sY,sM,sD,d);
+  syncSliders(); compute();
+}
+function setEnd(d){
+  curEnd=d;
+  if(d) setSelects(eY,eM,eD,d);
+  syncSliders(); compute();
+}
+
+// ---- 滑块 ----
+function dateToSlider(d){
+  if(!d) return null;
+  const diff = daysBetween(TODAY, d);
+  if(diff<0) return 0;
+  if(diff>MAXD) return MAXD;
+  return diff;
+}
+function sliderToDate(v){ return addDays(TODAY, +v); }
+
+function buildTicks(){
+  const t=$('ticks'); t.innerHTML='';
+  // 按自然月：从本月1号起，逐月推进，直到超过 MAXD 天
+  let cursor=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
+  while(true){
+    const off=daysBetween(TODAY,cursor);
+    if(off>MAXD) break;
+    if(off>=0){
+      const isToday = off===0;
+      const el=document.createElement('div');
+      el.className='tick'+(isToday?' today':'');
+      el.style.left=(off/MAXD*100)+'%';
+      el.innerHTML=`<div class="tick-line"></div>
+        <div class="tick-label">${isToday?'今天':(cursor.getMonth()+1)+'月'}</div>`;
+      t.appendChild(el);
+    }
+    cursor=new Date(cursor.getFullYear(),cursor.getMonth()+1,1);
+  }
+}
+function updateSel(){
+  let a=+r1.value, b=+r2.value;
+  let lo=Math.min(a,b), hi=Math.max(a,b);
+  const sel=$('sel');
+  const pct = v => (v/MAXD*100);
+  sel.style.left = pct(lo)+'%';
+  sel.style.width = (pct(hi)-pct(lo))+'%';
+}
+function syncSliders(){
+  // 根据当前 start/end 反推滑块位置（若日期超出 0~400 范围则夹紧）
+  const s = curStart? dateToSlider(curStart) : 0;
+  const e = curEnd? dateToSlider(curEnd) : MAXD;
+  // 保证两滑块分代表 start/end（用顺序而非值大小）
+  r1.value = curStart? s : 0;
+  r2.value = curEnd? e : MAXD;
+  updateSel();
+  $('thumbStart').textContent = curStart? fmt(curStart) : '—';
+  $('thumbEnd').textContent = curEnd? fmt(curEnd) : '—';
+}
+function onSlider(){
+  // 先读两个滑块值，避免 setStart/setEnd 内部 syncSliders 把另一个滑块重置回旧值
+  const sv = +r1.value, ev = +r2.value;
+  curStart = sliderToDate(sv);
+  curEnd   = sliderToDate(ev);
+  setSelects(sY,sM,sD,curStart);
+  setSelects(eY,eM,eD,curEnd);
+  $('thumbStart').textContent = fmt(curStart);
+  $('thumbEnd').textContent   = fmt(curEnd);
+  compute();
+}
+
+// ---- 计算 ----
+function compute(){
+  if(!curStart||!curEnd){
+    $('bigDays').textContent='—';
+    $('desc').textContent='请选择两个日期';
+    $('break').innerHTML='';
+    return;
+  }
+  let diff = daysBetween(curStart,curEnd);
+  $('bigDays').textContent = diff;
+  $('bigDays').className = 'big'+(diff<0?' neg':'');
+  $('desc').innerHTML =
+    `<b>${fmt(curStart)}</b> ${diff<0?'早于':'相距'} <b>${fmt(curEnd)}</b>` +
+    (diff<0?'（结束早于起始）':'');
+  $('break').innerHTML = '';
+}
+
+// ---- 事件绑定 ----
+function onSelStart(){ curStart=readSelects(sY,sM,sD); syncSliders(); compute(); }
+function onSelEnd(){   curEnd  =readSelects(eY,eM,eD); syncSliders(); compute(); }
+[sY,sM,sD].forEach(s=>s.addEventListener('change',onSelStart));
+[eY,eM,eD].forEach(s=>s.addEventListener('change',onSelEnd));
+
+document.querySelectorAll('.seg button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tgt=btn.dataset.tgt, what=btn.dataset.what;
+    const d = what==='today' ? TODAY : addDays(TODAY,+what);
+    if(tgt==='start') setStart(d); else setEnd(d);
+  });
+});
+
+r1.addEventListener('input',()=>{updateSel();onSlider();if(dragging)showTip(dragging);});
+r2.addEventListener('input',()=>{updateSel();onSlider();if(dragging)showTip(dragging);});
+
+// ---- 拖动悬浮窗 ----
+const tip=$('tip');
+let dragging=null;       // 'r1' | 'r2'
+let mouseX=0, mouseY=0;
+function fmtCN(d){return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;}
+function positionTip(){tip.style.left=mouseX+'px';tip.style.top=mouseY+'px';}
+function showTip(which){
+  const v=+(which==='r1'?r1.value:r2.value);
+  tip.textContent=fmtCN(sliderToDate(v));
+  tip.style.display='block';
+  positionTip();
+}
+function hideTip(){tip.style.display='none';}
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;if(dragging)positionTip();});
+document.addEventListener('pointermove',e=>{mouseX=e.clientX;mouseY=e.clientY;if(dragging)positionTip();});
+r1.addEventListener('pointerdown',()=>{dragging='r1';showTip('r1');});
+r2.addEventListener('pointerdown',()=>{dragging='r2';showTip('r2');});
+window.addEventListener('pointerup',()=>{dragging=null;hideTip();});
+window.addEventListener('mouseup',()=>{dragging=null;hideTip();});
+
+// ---- 初始化 ----
+buildTicks();
+fillYearMonth();
+setStart(TODAY);
+setEnd(addDays(TODAY,400));
+</script>
 </body>
 </html>
